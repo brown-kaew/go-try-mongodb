@@ -5,14 +5,39 @@ networks:
     name: my-network
 
 services:
+  app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: always
+    networks:
+      - my-network
+    ports:
+      - '2565:2565'
+    environment:
+      DATABASE_URL: mongodb://root:example@mongo:27017/
+    depends_on:
+      - mongo
+      # mongo:
+      #   condition: service_healthy
+
   mongo:
     image: mongo
     restart: always
     networks:
       - my-network
+    # ports:
+    #   - '27017:27017'
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+    # volumes:
+    #   - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    # healthcheck:
+    #   test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/mydb --quiet
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
 
   mongo-express:
     image: mongo-express
