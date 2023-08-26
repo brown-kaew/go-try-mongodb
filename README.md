@@ -1,6 +1,6 @@
 # go-try-mongodb
 
-An example `users` api that lookup user by id in redis before mongoDB by id
+An example `users` api that lookup user by id in redis before mongoDB
 - http://localhost:8080/users/:id
 
 The test data
