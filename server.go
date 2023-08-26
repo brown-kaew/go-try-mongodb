@@ -17,6 +17,7 @@ import (
 func main() {
 	userDb := user.NewDb()
 	defer userDb.Close()
+	simpleRedis := user.NewSimpleRedis()
 
 	e := echo.New()
 	e.Logger.SetLevel(log.INFO)
@@ -27,7 +28,7 @@ func main() {
 		return c.JSON(http.StatusOK, "OK")
 	})
 
-	userHandler := user.NewHandler(userDb)
+	userHandler := user.NewHandler(userDb, simpleRedis)
 	g := e.Group("/users")
 	g.GET("/:id", userHandler.FindById())
 

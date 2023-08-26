@@ -43,6 +43,7 @@ func (simpleRedis *simpleRedis) Get(key string) *User {
 	} else if err != nil {
 		log.Printf("error=%v", err)
 	} else {
+		log.Printf("redis found key=%s", key)
 		var user User
 		json.Unmarshal([]byte(value), &user)
 		return &user
@@ -56,7 +57,7 @@ func (simpleRedis *simpleRedis) Put(key string, user *User) error {
 		return err
 	}
 
-	err = simpleRedis.client.Set(simpleRedis.ctx, key, string(value), 1*time.Minute).Err()
+	err = simpleRedis.client.Set(simpleRedis.ctx, key, string(value), 10*time.Minute).Err()
 	if err != nil {
 		return err
 	}
