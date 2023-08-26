@@ -8,6 +8,7 @@ import (
 
 func main() {
 	fmt.Println("hello world")
-	_, closeUserDb := user.TryAddAndFindData()
-	defer closeUserDb()
+	userDb := user.NewUserDB()
+	defer userDb.Close()
+	userDb.FindAll()
 }
