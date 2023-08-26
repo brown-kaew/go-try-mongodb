@@ -10,32 +10,34 @@ The test data
     { id: 3, name: "John" },
 ```
 
-## to run this project
+## To run this project
 ```bash
 docker-compose up --build app
 ```
 
-## Init module
+
+## Notes
+### Init module
 ```bash
 go mod init github.com/brown-kaew/go-try-mongodb    
 ```
 
-## Init server.go main package
+### Init server.go main package
 ```bash
 touch server.go
 ```
 
-## Load dependency after import public package
+### Load dependency after import public package
 ```bash
 go mod tidy    
 ```
 
-## Run
+### Run
 ```bash
 go run server.go
 ```
 
-## Build
+### Build
 ```bash
 go build -o ./out .
 ```
