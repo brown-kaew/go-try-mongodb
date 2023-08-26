@@ -11,4 +11,5 @@ func main() {
 	userDb := user.NewUserDB()
 	defer userDb.Close()
 	userDb.FindAll()
+	userDb.FindById(2)
 }
