@@ -13,11 +13,13 @@ services:
     networks:
       - my-network
     ports:
-      - '8080:8080'
+      - 8080:8080
     environment:
       DATABASE_URL: mongodb://root:example@mongo:27017/
+      REDIS_ADDRESS: redis:6379
     depends_on:
       - mongo
+      - redis
       # mongo:
       #   condition: service_healthy
 
@@ -38,17 +40,23 @@ services:
     #   interval: 10s
     #   timeout: 5s
     #   retries: 5
-
-  mongo-express:
-    image: mongo-express
-    restart: always
+  
+  redis:
+    image: redis:7.2-alpine
     networks:
       - my-network
-    ports:
-      - 3000:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
-    depends_on:
-      - mongo
+    command: redis-server
+
+  # mongo-express:
+  #   image: mongo-express
+  #   restart: always
+  #   networks:
+  #     - my-network
+  #   ports:
+  #     - 3000:8081
+  #   environment:
+  #     ME_CONFIG_MONGODB_ADMINUSERNAME: root
+  #     ME_CONFIG_MONGODB_ADMINPASSWORD: example
+  #     ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+  #   depends_on:
+  #     - mongo
