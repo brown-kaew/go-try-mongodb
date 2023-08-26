@@ -13,8 +13,8 @@ import (
 
 type UserDb interface {
 	Close()
-	FindAll()
-	FindById(id int64)
+	// FindAll()
+	FindById(id int64) (*User, error)
 }
 
 type userDb struct {
@@ -22,7 +22,13 @@ type userDb struct {
 	close      func()
 }
 
-func NewUserDB() UserDb {
+type User struct {
+	ObjectID string `json:"_id" bson:"_id"`
+	Id       int64  `json:"id" bson:"id"`
+	Name     string `json:"name" bson:"name"`
+}
+
+func NewDb() UserDb {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -31,6 +37,7 @@ func NewUserDB() UserDb {
 		log.Fatal(err)
 	}
 
+	log.Printf("Connected to MongoDB")
 	collection := client.Database("mydb").Collection("user")
 	return &userDb{
 		collection: collection,
@@ -46,52 +53,48 @@ func (userDb *userDb) Close() {
 	userDb.close()
 }
 
-func (userDb *userDb) FindAll() {
+// func (userDb *userDb) FindAll() {
+// 	collection := userDb.collection
+
+// 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+// 	defer cancel()
+// 	cur, err := collection.Find(ctx, bson.D{})
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	defer cur.Close(ctx)
+// 	for cur.Next(ctx) {
+// 		var result bson.D
+// 		err := cur.Decode(&result)
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+// 		// do something with result....
+// 		log.Printf("result=%v\n", result)
+// 	}
+// 	if err := cur.Err(); err != nil {
+// 		log.Fatal(err)
+// 	}
+// }
+
+func (userDb *userDb) FindById(id int64) (*User, error) {
 	collection := userDb.collection
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	cur, err := collection.Find(ctx, bson.D{})
+
+	var user User
+	result := collection.FindOne(ctx, bson.D{{Key: "id", Value: id}})
+	if err := result.Err(); err != nil {
+		return nil, err
+	}
+
+	err := result.Decode(&user)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer cur.Close(ctx)
-	for cur.Next(ctx) {
-		var result bson.D
-		err := cur.Decode(&result)
-		if err != nil {
-			log.Fatal(err)
-		}
-		// do something with result....
-		log.Printf("result=%v\n", result)
-	}
-	if err := cur.Err(); err != nil {
-		log.Fatal(err)
-	}
-}
-
-func (userDb *userDb) FindById(id int64) {
-	collection := userDb.collection
-
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-	cur, err := collection.Find(ctx, bson.D{{Key: "id", Value: id}})
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer cur.Close(ctx)
-	for cur.Next(ctx) {
-		var result bson.D
-		err := cur.Decode(&result)
-		if err != nil {
-			log.Fatal(err)
-		}
-		// do something with result....
-		log.Printf("result=%v\n", result)
-	}
-	if err := cur.Err(); err != nil {
-		log.Fatal(err)
-	}
+	// log.Printf("res=%v", user)
+	return &user, nil
 }
 
 // func TryAddAndFindData() (*mongo.Collection, func()) {
